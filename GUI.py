@@ -17,7 +17,9 @@ def dropFile(event):
 
     #obtains file path from the event
     filePath = event.data
-    
+    #removes { } which can occur when dragging and dropping file from local onedrive folder
+    if filePath[0]=="{":
+        filePath=filePath[1:-1]
     #displays selected file
     dragdrop.config(text=f"Dropped file:\n{filePath}")
     
@@ -30,19 +32,38 @@ def dropFile(event):
     
     #removes the previous field from the gui if it exists
     if exists!=False:
-        
         sheetEntry.pack_forget()
         sheetLabel.pack_forget()
     
     #checks if the file is xlsx and if so adds new input field for the sheet on which the data for the graph is found (as required by pandas)
-    if filePath[-5:-1]=="xlsx":
+    if filePath[-4:]=="xlsx":
         #creates and displays label for the sheet entry field
         sheetLabel = tk.Label(xyframe, text="Sheet:")
         sheetLabel.pack(side='left',pady=5)
         #creates and displays the sheet entry field
         sheetEntry = tk.Entry(xyframe)
         sheetEntry.pack(side='left',pady=5)
-    
+        sheetEntry.insert(0, "Sheet1") #placeholder text 
+        sheetEntry.config(fg="gray")  #set placeholder text colour
+        #bind focusIn and FocusOut functions to entry field to add placeholder txt
+        sheetEntry.bind("<FocusIn>", lambda event: onFocusIn(sheetEntry, "Sheet1"))
+        sheetEntry.bind("<FocusOut>", lambda event: onFocusOut(sheetEntry, "Sheet1"))
+
+def onFocusIn(entry, placeholderText):
+    """Focus on input box
+    When an entry field is clicked on clears the placeholder text if it's still there
+    """
+    if entry.get() == placeholderText:#checks if placeholder text is in textbox
+        entry.delete(0, tk.END) #deletes placeholder text
+        entry.config(fg="black")  #change text colour to black 
+
+def onFocusOut(entry, placeholderText):
+    """Focus off input box
+    When an entry field is clicked off of restores the placeholder text if the field is empty
+    """
+    if entry.get() == "": #checks if the textbox is empty
+        entry.insert(0, placeholderText) #adds appropriate placeholder text
+        entry.config(fg="grey")  #makes the placeholder text colour grey
 
 
 def runGraph():
@@ -59,7 +80,7 @@ def runGraph():
     xerr=xerrEntry.get()
     yerr=yerrEntry.get()
     func=fit.get()
-    file=filePath[1:-1]
+    
     #attempts to get input from sheet field but if it does not exist sets sheet var to a blank string
     try:
         sheet=sheetEntry.get()
@@ -68,7 +89,7 @@ def runGraph():
 
     #attempts to run graph.py
     try:
-        sp.run(['python', 'graph.py',file,sheet,x,y,xerr,yerr,func], check=True, capture_output=True, text=True)
+        sp.run(['python', 'graph.py',filePath,sheet,x,y,xerr,yerr,func], check=True, capture_output=True, text=True)
     
     #if there is an error running graph.py displays it on the gui
     except sp.CalledProcessError as e:
@@ -89,7 +110,7 @@ fitLabel = tk.Label(root, text="Fit:")
 fitLabel.pack()
 
 #Creates drop down menu with option for fittings and defaults to scatter
-options = ["Linear", "Scatter", ""]
+options = ["Linear", "Scatter", "nth order polynomial"]
 fit = ttk.Combobox(root, values=options)
 fit.pack(pady=10,padx=10)
 fit.set("Scatter") 
@@ -99,36 +120,58 @@ xyframe = tk.Frame(root)
 xyframe.pack()
 
 #creates and displays label for the x column entry field
-xcolLabel = tk.Label(xyframe, text="x:")
+xcolLabel = tk.Label(xyframe, text="x column name:")
 xcolLabel.pack(side='left',pady=5)
 #creates and displays the x column entry field
 xcolEntry = tk.Entry(xyframe)
 xcolEntry.pack(side='left',pady=5)
+xcolEntry.insert(0, "x") #placeholder text 
+xcolEntry.config(fg="gray")  #set placeholder text colour
+#bind focusIn and FocusOut functions to entry field to add placeholder txt
+xcolEntry.bind("<FocusIn>", lambda event: onFocusIn(xcolEntry, "x"))
+xcolEntry.bind("<FocusOut>", lambda event: onFocusOut(xcolEntry, "x"))
+
 
 #creates and displays label for the y column entry field
-ycolLabel = tk.Label(xyframe, text="y:")
+ycolLabel = tk.Label(xyframe, text="y column name:")
 ycolLabel.pack(side='left',pady=5)
 #creates and displays the y column entry field
 ycolEntry = tk.Entry(xyframe)
 ycolEntry.pack(side='left',pady=5)
+ycolEntry.insert(0, "y") #placeholder text 
+ycolEntry.config(fg="gray")  #set placeholder text colour
+#bind focusIn and FocusOut functions to entry field to add placeholder txt
+ycolEntry.bind("<FocusIn>", lambda event: onFocusIn(ycolEntry, "y"))
+ycolEntry.bind("<FocusOut>", lambda event: onFocusOut(ycolEntry, "y"))
 
 #creates frame for the error columns entry fields
 errframe = tk.Frame(root)
 errframe.pack()
 
 #creates and displays label for the x error column entry field
-xerrLabel = tk.Label(errframe, text="x err:")
+xerrLabel = tk.Label(errframe, text="x error:")
 xerrLabel.pack(side='left',pady=5)
 #creates and displays the x error column entry field
 xerrEntry = tk.Entry(errframe)
 xerrEntry.pack(side='left',pady=5)
+xerrEntry.insert(0, "xerr") #placeholder text 
+xerrEntry.config(fg="gray")  #set placeholder text colour
+#bind focusIn and FocusOut functions to entry field to add placeholder txt
+xerrEntry.bind("<FocusIn>", lambda event: onFocusIn(xerrEntry, "xerr"))
+xerrEntry.bind("<FocusOut>", lambda event: onFocusOut(xerrEntry, "xerr"))
+
 
 #creates and displays label for the y error column entry field
-yerrLabel = tk.Label(errframe, text="y err:")
+yerrLabel = tk.Label(errframe, text="y error:")
 yerrLabel.pack(side='left',pady=5)
 #creates and displays the y error column entry field
 yerrEntry = tk.Entry(errframe)
 yerrEntry.pack(side='left',pady=5)
+yerrEntry.insert(0, "yerr") #placeholder text 
+yerrEntry.config(fg="gray")  #set placeholder text colour
+#bind focusIn and FocusOut functions to entry field to add placeholder txt
+yerrEntry.bind("<FocusIn>", lambda event: onFocusIn(yerrEntry, "yerr"))
+yerrEntry.bind("<FocusOut>", lambda event: onFocusOut(yerrEntry, "yerr"))
 
 #creates a drag and drop field for the user to drop a file
 dragdrop = tk.Label(root, text="Drag & Drop a csv or xlsx file here", bg="lightgray", width=50, height=10)
