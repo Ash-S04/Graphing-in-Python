@@ -2,14 +2,12 @@
 Basic Graphing program in python for csv or excel files
 
 
-Download the Graph.py file and run.
+Download the GUI.py and graph.py files and run GUI.py.
 
-Input the file name you want to graph with the file extension
-(if an excel file then the sheet name of the sheet containing the table otherwise leave blank)
+Drag and drop the file with the data you want to plot and fill in all entry fields, then click create graph
 
-When prompted enter the headers for the columns you wish to use as the x and y values and there errors
 
-Input linear if you wish to use scipy optimise to find the linear fit of the data or leave blank for a scatter plot
+select linear if you wish to use scipy optimise to find the linear fit of the data or leave blank for a scatter plot
 
 Will output the optimised values of a and b and the errors from linear equation y=ax+b if optimisation occurs
 
@@ -18,6 +16,9 @@ numpy
 scipy
 pandas
 matplotlib
+sys
+tkinter
+tkinterdnd2
 
 
 
